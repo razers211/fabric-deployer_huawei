@@ -1,25 +1,25 @@
 ---
 - name: Configure system hostname
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "sysname {{ inventory_hostname }}"
 
 - name: Configure NTP servers
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "ntp-server {{ item }}"
   loop: "{{ ntp_servers }}"
   when: ntp_servers is defined
 
 - name: Configure syslog servers
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "loghost {{ item }}"
   loop: "{{ syslog_servers }}"
   when: syslog_servers is defined
 
 - name: Configure SNMP
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "snmp-agent community read {{ snmp_community }}"
       - "snmp-agent sys-info location {{ snmp_location }}"
@@ -27,7 +27,7 @@
   when: snmp_community is defined
 
 - name: Enable IP routing
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "ip routing"
 
@@ -35,5 +35,5 @@
   include_tasks: configure_loopbacks.yml
 
 - name: Save configuration
-  huawei.vrrp.vrrp_command:
+  huawei.vrp.vrp_command:
     commands: "save"

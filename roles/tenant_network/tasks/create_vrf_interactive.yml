@@ -1,6 +1,6 @@
 ---
 - name: Create tenant VRF with interactive parameters
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "ip vpn-instance {{ vrf_name }}"
       - "description VRF for {{ tenant_name }}"
@@ -9,7 +9,7 @@
       - "vpn-target {{ route_target }} import-extcommunity"
 
 - name: Verify VRF creation
-  huawei.vrrp.vrrp_command:
+  huawei.vrp.vrp_command:
     commands: "display ip vpn-instance | include {{ vrf_name }}"
   register: vrf_check
 

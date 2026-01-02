@@ -1,13 +1,13 @@
 ---
 - name: Create tenant VLANs from interactive range
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "vlan {{ item }}"
       - "description {{ tenant_name }} VLAN {{ item }}"
   loop: "{{ tenant_vlans }}"
 
 - name: Configure VLAN interfaces in VRF with interactive parameters
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "interface Vlanif{{ item }}"
       - "ip binding vpn-instance {{ vrf_name }}"
@@ -16,14 +16,14 @@
   loop: "{{ tenant_vlans }}"
 
 - name: Enable ARP broadcast for VLAN interfaces
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "interface Vlanif{{ item }}"
       - "arp broadcast enable"
   loop: "{{ tenant_vlans }}"
 
 - name: Verify VLAN interfaces
-  huawei.vrrp.vrrp_command:
+  huawei.vrp.vrp_command:
     commands: "display interface Vlanif{{ item }}"
   loop: "{{ tenant_vlans }}"
   register: vlan_check

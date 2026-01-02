@@ -4,7 +4,7 @@
   gather_facts: no
   serial: 1
   vars:
-    ansible_network_os: huawei.vrrp
+    ansible_network_os: huawei.vrp
   
   tasks:
     - name: Check BGP neighbor status
@@ -43,7 +43,7 @@
   hosts: dc_gateway
   gather_facts: no
   vars:
-    ansible_network_os: huawei.vrrp
+    ansible_network_os: huawei.vrp
   
   tasks:
     - name: Check BGP routes from fabric

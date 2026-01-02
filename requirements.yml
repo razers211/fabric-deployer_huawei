@@ -1,11 +1,11 @@
 ---
 collections:
-  - name: huawei.vrrp
+  - name: huawei.vrp
     version: ">=1.0.0"
   - name: ansible.netcommon
     version: ">=2.0.0"
   - name: community.network
     version: ">=3.0.0"
 
-# Note: External roles removed as they don't exist
-# Use built-in Ansible modules for backup and verification
+# Note: Using huawei.vrp instead of huawei.vrrp
+# huawei.vrp is the correct collection for Huawei VRP devices

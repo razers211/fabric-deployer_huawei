@@ -4,7 +4,7 @@
   gather_facts: no
   serial: 1
   vars:
-    ansible_network_os: huawei.vrrp
+    ansible_network_os: huawei.vrp
     
     # Set defaults that can be overridden by AWX survey variables
     interface_ip_prefix: "{{ interface_ip_prefix | default('10.255.1.0/31') }}"
@@ -66,7 +66,7 @@
   hosts: dc_gateway
   gather_facts: no
   vars:
-    ansible_network_os: huawei.vrrp
+    ansible_network_os: huawei.vrp
     gateway_asn: "{{ gateway_asn | default('65400') }}"
 
   tasks:

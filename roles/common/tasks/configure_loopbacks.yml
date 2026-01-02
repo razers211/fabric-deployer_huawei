@@ -1,13 +1,13 @@
 ---
 - name: Configure loopback0 for management
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "interface Loopback0"
       - "ip address {{ ansible_host }}/32"
       - "description Management Loopback"
 
 - name: Configure VTEP loopback for VXLAN
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "interface {{ vxlan_vtep_loopback }}"
       - "ip address {{ hostvars[inventory_hostname].vtep_ip }}/32"
@@ -17,7 +17,7 @@
     - hostvars[inventory_hostname].vtep_ip is defined
 
 - name: Configure BGP router ID loopback
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "interface Loopback2"
       - "ip address {{ router_id }}/32"

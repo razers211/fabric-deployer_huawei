@@ -1,6 +1,6 @@
 ---
 - name: Configure SVI for tenant VLANs with interactive parameters
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "interface Vlanif{{ item }}"
       - "ip binding vpn-instance {{ vrf_name }}"
@@ -11,7 +11,7 @@
   loop: "{{ tenant_vlans }}"
 
 - name: Configure VRRP for SVI redundancy
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "interface Vlanif{{ item }}"
       - "vrrp vrid {{ tenant_id }} virtual-ip {{ tenant_network_prefix }}{{ item }}.254"
@@ -20,7 +20,7 @@
   when: vrrp_priority is defined
 
 - name: Enable DHCP relay on SVI
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "interface Vlanif{{ item }}"
       - "dhcp select relay"
@@ -33,7 +33,7 @@
     - dhcp_item in dhcp_server_list
 
 - name: Configure DHCP relay for multiple servers
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "interface Vlanif{{ item.0 }}"
       - "dhcp relay server-ip {{ item.1 }}"
@@ -43,7 +43,7 @@
     - dhcp_server_list | length > 1
 
 - name: Verify SVI configuration
-  huawei.vrrp.vrrp_command:
+  huawei.vrp.vrp_command:
     commands: "display ip interface brief | include Vlanif{{ item }}"
   loop: "{{ tenant_vlans }}"
   register: svi_check

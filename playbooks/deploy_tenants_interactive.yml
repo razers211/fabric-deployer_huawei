@@ -4,7 +4,7 @@
   gather_facts: no
   serial: 1
   vars:
-    ansible_network_os: huawei.vrrp
+    ansible_network_os: huawei.vrp
     
     # Interactive variables from AWX survey
     tenant_id: "{{ tenant_id | default(100) }}"

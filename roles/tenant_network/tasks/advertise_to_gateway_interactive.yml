@@ -1,6 +1,6 @@
 ---
 - name: Advertise tenant networks to gateway
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "bgp {{ device_asn | default(asn) }}"
       - "ipv4-family vpn-instance {{ vrf_name }}"
@@ -12,7 +12,7 @@
     - device_asn is defined or asn is defined
 
 - name: Configure route redistribution for tenant VRF
-  huawei.vrrp.vrrp_config:
+  huawei.vrp.vrp_config:
     lines:
       - "bgp {{ device_asn | default(asn) }}"
       - "ipv4-family vpn-instance {{ vrf_name }}"
@@ -24,7 +24,7 @@
     - groups.dc_gateway is defined
 
 - name: Verify route advertisements
-  huawei.vrrp.vrrp_command:
+  huawei.vrp.vrp_command:
     commands: "display bgp vpnv4 vpn-instance {{ vrf_name }} routing-table"
   register: route_advertisement
 
