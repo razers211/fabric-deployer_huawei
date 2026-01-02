@@ -1,0 +1,83 @@
+---
+- name: Deploy Spine-Leaf Fabric
+  description: Deploy complete spine-leaf fabric with BGP/EVPN and VXLAN
+  job_type: run
+  inventory: Spine-Leaf Fabric
+  project: Spine-Leaf Architecture
+  playbook: playbooks/deploy_fabric.yml
+  credentials:
+    - Network_Admin_Creds
+  verbosity: 2
+  job_tags: fabric
+  forks: 5
+  timeout: 3600
+  extra_vars:
+    fabric_deployment: true
+    verification_enabled: true
+  ask_variables_on_launch: true
+  ask_tags_on_launch: true
+  ask_inventory_on_launch: false
+  ask_credential_on_launch: false
+  survey_enabled: true
+  survey_spec:
+    name: Fabric Deployment Options
+    description: Configure fabric deployment parameters
+    spec:
+      - question_name: Interface IP Prefix
+        question_description: IP prefix for spine-leaf links (e.g., 10.255.1.0/31)
+        required: true
+        type: text
+        variable: interface_ip_prefix
+        default: "10.255.1.0/31"
+      - question_name: Spine ASN
+        question_description: Autonomous System Number for spine switches
+        required: true
+        type: text
+        variable: spine_asn
+        default: "65001"
+      - question_name: Leaf ASN Base
+        question_description: Base ASN for leaf switches (will be incremented)
+        required: true
+        type: text
+        variable: leaf_asn_base
+        default: "65002"
+      - question_name: VNI Base
+        question_description: Starting VNI number for VXLAN
+        required: true
+        type: integer
+        variable: vni_base
+        default: 10000
+      - question_name: VLAN Base
+        question_description: Starting VLAN number for tenant networks
+        required: true
+        type: integer
+        variable: vlan_base
+        default: 1000
+      - question_name: VTEP Loopback Network
+        question_description: Network for VTEP loopback interfaces
+        required: true
+        type: text
+        variable: vtep_loopback_network
+        default: "10.0.0.0/24"
+      - question_name: Management Network
+        question_description: Network for device management
+        required: true
+        type: text
+        variable: management_network
+        default: "10.0.1.0/24"
+      - question_name: Enable Verification
+        question_description: Run post-deployment verification tests
+        required: true
+        type: boolean
+        variable: verification_enabled
+        default: "true"
+      - question_name: Deployment Mode
+        question_description: Choose deployment mode
+        required: true
+        type: multiplechoice
+        variable: deployment_mode
+        choices:
+          - full
+          - incremental
+          - validation_only
+        default: full

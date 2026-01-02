@@ -1,0 +1,27 @@
+---
+- name: Configure spine-leaf interfaces
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface {{ item.spine_interface }}"
+      - "description Link to {{ item.leaf }}"
+      - "ip address {{ item.spine_ip }}/31"
+      - "mtu 9216"
+      - "undo shutdown"
+  loop: "{{ spine_leaf_links }}"
+  when: 
+    - item.spine == inventory_hostname
+    - item.spine_ip is defined
+
+- name: Calculate spine IP addresses
+  set_fact:
+    spine_ip_map: "{{ spine_ip_map | default({}) | combine({item.spine_interface: item.ip_network.split('/')[0] | ipmath(0)}) }}"
+  loop: "{{ spine_leaf_links }}"
+  when: item.spine == inventory_hostname
+
+- name: Update spine links with calculated IPs
+  set_fact:
+    spine_leaf_links_updated: "{{ spine_leaf_links | map('combine', {'spine_ip': spine_ip_map[item.spine_interface]}) | list }}"
+  vars:
+    spine_ip_map: "{{ spine_ip_map | default({}) }}"
+  loop: "{{ spine_leaf_links }}"
+  when: item.spine == inventory_hostname

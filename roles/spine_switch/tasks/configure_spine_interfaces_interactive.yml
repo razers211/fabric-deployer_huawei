@@ -1,0 +1,33 @@
+---
+- name: Calculate spine interface IPs from interactive prefix
+  set_fact:
+    spine_interface_ips: "{{ spine_interface_ips | default({}) | combine({item.spine_interface: interface_ip_prefix | ipaddr('net') | ipmath(spine_ip_counter)}) }}"
+    spine_ip_counter: "{{ spine_ip_counter | default(0) + 2 }}"
+  loop: "{{ spine_leaf_links }}"
+  when: item.spine == inventory_hostname
+
+- name: Configure spine-leaf interfaces with interactive parameters
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface {{ item.spine_interface }}"
+      - "description Link to {{ item.leaf }}"
+      - "ip address {{ spine_interface_ips[item.spine_interface] }}/31"
+      - "mtu {{ interface_mtu | default(9216) }}"
+      - "undo shutdown"
+  loop: "{{ spine_leaf_links }}"
+  when: 
+    - item.spine == inventory_hostname
+    - spine_interface_ips[item.spine_interface] is defined
+
+- name: Verify spine interfaces
+  huawei.vrrp.vrrp_command:
+    commands: "display interface {{ item.spine_interface }}"
+  loop: "{{ spine_leaf_links }}"
+  when: item.spine == inventory_hostname
+  register: spine_interface_check
+
+- name: Display spine interface verification
+  debug:
+    msg: "Spine interface {{ item.item.spine_interface }} configured with IP {{ spine_interface_ips[item.item.spine_interface] }}/31"
+  loop: "{{ spine_interface_check.results }}"
+  when: "'up' in item.stdout"

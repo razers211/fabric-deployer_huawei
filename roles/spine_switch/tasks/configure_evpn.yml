@@ -1,0 +1,24 @@
+---
+- name: Configure BGP EVPN address family
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "bgp {{ asn }}"
+      - "l2vpn-family evpn"
+      - "peer {{ item }} enable"
+      - "peer {{ item }} advertise irb"
+      - "peer {{ item }} advertise l2vpn evpn"
+  loop: "{{ groups.leaf }}"
+
+- name: Configure EVPN route targets
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "bgp {{ asn }}"
+      - "l2vpn-family evpn"
+      - "vpn-instance {{ item.vrf_name }}"
+      - "route-distinguisher {{ vrf_route_distinguisher_base + item.tenant_id }}:{{ item.tenant_id }}"
+      - "vpn-target {{ vrf_route_target_base + item.tenant_id }}:{{ item.tenant_id }} export-extcommunity"
+      - "vpn-target {{ vrf_route_target_base + item.tenant_id }}:{{ item.tenant_id }} import-extcommunity"
+  loop: "{{ hostvars[inventory_hostname].tenants | default([]) }}"
+  when: 
+    - item.vrf_name is defined
+    - item.tenant_id is defined

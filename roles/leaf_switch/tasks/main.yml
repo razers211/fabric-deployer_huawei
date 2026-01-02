@@ -1,0 +1,15 @@
+---
+- name: Configure leaf interfaces
+  include_tasks: configure_leaf_interfaces.yml
+
+- name: Configure BGP on leaf
+  include_tasks: configure_bgp.yml
+
+- name: Configure EVPN address family
+  include_tasks: configure_evpn.yml
+
+- name: Configure VXLAN
+  include_tasks: configure_vxlan.yml
+
+- name: Verify leaf configuration
+  include_tasks: verify_leaf.yml

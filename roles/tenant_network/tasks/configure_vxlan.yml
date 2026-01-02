@@ -1,0 +1,33 @@
+---
+- name: Create VXLAN VNI for tenant
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "vxlan vni {{ tenant_vni_base + tenant_id }}"
+      - "description {{ tenant_name }} VXLAN VNI"
+
+- name: Bind VNI to VLAN
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "bridge-domain {{ tenant_id }}"
+      - "vxlan vni {{ tenant_vni_base + tenant_id }}"
+      - "l2 multicast enable"
+
+- name: Configure VNI mapping
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface {{ vxlan_nve_interface }}"
+      - "vni {{ tenant_vni_base + tenant_id }} head-end peer-list {{ item }}"
+  loop: "{{ groups.spine }}"
+  when: 
+    - vxlan_nve_interface is defined
+    - tenant_vni_base is defined
+
+- name: Configure EVPN for VNI
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "bgp {{ asn }}"
+      - "l2vpn-family evpn"
+      - "peer {{ item }} advertise irb"
+      - "peer {{ item }} advertise l2vpn evpn"
+  loop: "{{ groups.spine }}"
+  when: asn is defined

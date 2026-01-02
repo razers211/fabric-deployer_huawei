@@ -1,0 +1,24 @@
+---
+- name: Create tenant VRF with interactive parameters
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "ip vpn-instance {{ vrf_name }}"
+      - "description VRF for {{ tenant_name }}"
+      - "route-distinguisher {{ route_distinguisher }}"
+      - "vpn-target {{ route_target }} export-extcommunity"
+      - "vpn-target {{ route_target }} import-extcommunity"
+
+- name: Verify VRF creation
+  huawei.vrrp.vrrp_command:
+    commands: "display ip vpn-instance | include {{ vrf_name }}"
+  register: vrf_check
+
+- name: Display VRF verification
+  debug:
+    msg: "VRF {{ vrf_name }} created successfully with RD {{ route_distinguisher }} and RT {{ route_target }}"
+  when: vrf_name in vrf_check.stdout
+
+- name: Fail if VRF creation failed
+  fail:
+    msg: "VRF {{ vrf_name }} creation failed"
+  when: vrf_name not in vrf_check.stdout

@@ -1,0 +1,32 @@
+---
+- name: Configure BGP process
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "bgp {{ asn }}"
+      - "router-id {{ router_id }}"
+      - "peer {{ item }} as-number {{ hostvars[item].asn }}"
+      - "peer {{ item }} connect-retry-interval {{ bgp_connect_retry }}"
+      - "peer {{ item }} hold-time {{ bgp_hold_time }}"
+      - "peer {{ item }} keepalive-time {{ bgp_keepalive }}"
+  loop: "{{ connected_spines | default(groups.spine) }}"
+  when: 
+    - asn is defined
+    - router_id is defined
+
+- name: Configure BGP underlay address family
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "bgp {{ asn }}"
+      - "ipv4-family unicast"
+      - "peer {{ item }} enable"
+      - "peer {{ item }} route-policy SPINE_IN in"
+      - "peer {{ item }} route-policy SPINE_OUT out"
+  loop: "{{ connected_spines | default(groups.spine) }}"
+
+- name: Create BGP route policies
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "route-policy SPINE_IN deny node 10"
+      - "route-policy SPINE_IN permit node 20"
+      - "route-policy SPINE_OUT deny node 10"
+      - "route-policy SPINE_OUT permit node 20"

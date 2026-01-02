@@ -1,0 +1,34 @@
+---
+- name: Configure SVI for tenant VLANs
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface Vlanif{{ item }}"
+      - "ip binding vpn-instance {{ vrf_name }}"
+      - "ip address {{ tenant_network_prefix }}{{ item }}{{ tenant_gateway_suffix }}/24"
+      - "description {{ tenant_name }} SVI VLAN {{ item }}"
+      - "arp broadcast enable"
+      - "undo shutdown"
+  loop: "{{ tenant_vlans | default([tenant_vlan_base + tenant_id]) }}"
+  when: 
+    - tenant_network_prefix is defined
+    - tenant_gateway_suffix is defined
+
+- name: Configure VRRP for SVI redundancy
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface Vlanif{{ item }}"
+      - "vrrp vrid {{ tenant_id }} virtual-ip {{ tenant_network_prefix }}{{ item }}.254"
+      - "vrrp vrid {{ tenant_id }} priority {{ vrrp_priority | default(100) }}"
+  loop: "{{ tenant_vlans | default([tenant_vlan_base + tenant_id]) }}"
+  when: 
+    - tenant_network_prefix is defined
+    - vrrp_priority is defined
+
+- name: Enable DHCP relay on SVI
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface Vlanif{{ item }}"
+      - "dhcp select relay"
+      - "dhcp relay server-ip {{ item }}"
+  loop: "{{ dhcp_servers | default([]) }}"
+  when: dhcp_servers is defined

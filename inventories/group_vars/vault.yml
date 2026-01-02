@@ -1,0 +1,12 @@
+---
+# Encrypted Variables (ansible-vault encrypt this file)
+vault_spine_password: "Huawei@123"
+vault_leaf_password: "Huawei@123"
+vault_gateway_password: "Huawei@123"
+vault_enable_password: "Huawei@123"
+
+# BGP MD5 Passwords
+bgp_md5_password: "Huawei@123"
+
+# SNMP Community (encrypted)
+snmp_community_encrypted: "DCFabricRO"

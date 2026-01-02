@@ -1,0 +1,26 @@
+---
+- name: Create tenant VLANs
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "vlan {{ item }}"
+      - "description {{ tenant_name }} VLAN {{ item }}"
+  loop: "{{ tenant_vlans | default([tenant_vlan_base + tenant_id]) }}"
+
+- name: Configure VLAN interfaces in VRF
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface Vlanif{{ item }}"
+      - "ip binding vpn-instance {{ vrf_name }}"
+      - "ip address {{ tenant_network_prefix }}{{ item }}{{ tenant_gateway_suffix }}/24"
+      - "description {{ tenant_name }} Gateway VLAN {{ item }}"
+  loop: "{{ tenant_vlans | default([tenant_vlan_base + tenant_id]) }}"
+  when: 
+    - tenant_network_prefix is defined
+    - tenant_gateway_suffix is defined
+
+- name: Enable ARP broadcast for VLAN interfaces
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface Vlanif{{ item }}"
+      - "arp broadcast enable"
+  loop: "{{ tenant_vlans | default([tenant_vlan_base + tenant_id]) }}"

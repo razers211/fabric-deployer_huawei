@@ -1,0 +1,45 @@
+---
+- name: Deploy Tenant Networks
+  hosts: tenants
+  gather_facts: no
+  serial: 1
+  vars:
+    ansible_network_os: huawei.vrrp
+  
+  tasks:
+    - name: Create tenant VRF
+      include_role:
+        name: tenant_network
+        tasks_from: create_vrf
+      tags: [vrf, tenant]
+
+    - name: Configure tenant VLANs
+      include_role:
+        name: tenant_network
+        tasks_from: configure_vlans
+      tags: [vlan, tenant]
+
+    - name: Configure VXLAN for tenant
+      include_role:
+        name: tenant_network
+        tasks_from: configure_vxlan
+      tags: [vxlan, tenant]
+
+    - name: Configure tenant SVIs
+      include_role:
+        name: tenant_network
+        tasks_from: configure_svi
+      tags: [svi, tenant]
+
+    - name: Advertise tenant networks to gateway
+      include_role:
+        name: tenant_network
+        tasks_from: advertise_to_gateway
+      tags: [gateway, tenant]
+      when: role == 'leaf'
+
+    - name: Verify tenant configuration
+      include_role:
+        name: tenant_network
+        tasks_from: verify_tenant
+      tags: [verify, tenant]

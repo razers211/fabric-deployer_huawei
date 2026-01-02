@@ -1,0 +1,4 @@
+---
+- name: Tenant network deployment main task
+  debug:
+    msg: "Deploying tenant {{ tenant_name }} (ID: {{ tenant_id }})"

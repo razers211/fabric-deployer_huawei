@@ -1,0 +1,38 @@
+---
+- name: Configure leaf-spine interfaces
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface {{ item.leaf_interface }}"
+      - "description Link to {{ item.spine }}"
+      - "ip address {{ item.leaf_ip }}/31"
+      - "mtu 9216"
+      - "undo shutdown"
+  loop: "{{ spine_leaf_links }}"
+  when: 
+    - item.leaf == inventory_hostname
+    - item.leaf_ip is defined
+
+- name: Calculate leaf IP addresses
+  set_fact:
+    leaf_ip_map: "{{ leaf_ip_map | default({}) | combine({item.leaf_interface: item.ip_network.split('/')[0] | ipmath(1)}) }}"
+  loop: "{{ spine_leaf_links }}"
+  when: item.leaf == inventory_hostname
+
+- name: Update leaf links with calculated IPs
+  set_fact:
+    spine_leaf_links_updated: "{{ spine_leaf_links | map('combine', {'leaf_ip': leaf_ip_map[item.leaf_interface]}) | list }}"
+  vars:
+    leaf_ip_map: "{{ leaf_ip_map | default({}) }}"
+  loop: "{{ spine_leaf_links }}"
+  when: item.leaf == inventory_hostname
+
+- name: Configure server access interfaces
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface {{ item.interface }}"
+      - "description {{ item.description | default('Server Access') }}"
+      - "port link-type access"
+      - "port default vlan {{ item.vlan }}"
+      - "undo shutdown"
+  loop: "{{ server_interfaces | default([]) }}"
+  when: server_interfaces is defined

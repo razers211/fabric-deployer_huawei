@@ -1,0 +1,82 @@
+---
+- name: Deploy Spine-Leaf Fabric (Interactive)
+  hosts: spine, leaf
+  gather_facts: no
+  serial: 1
+  vars:
+    ansible_network_os: huawei.vrrp
+    
+    # Set defaults that can be overridden by AWX survey variables
+    interface_ip_prefix: "{{ interface_ip_prefix | default('10.255.1.0/31') }}"
+    spine_asn: "{{ spine_asn | default('65001') }}"
+    leaf_asn_base: "{{ leaf_asn_base | default('65002') }}"
+    vni_base: "{{ vni_base | default(10000) }}"
+    vlan_base: "{{ vlan_base | default(1000) }}"
+    vtep_loopback_network: "{{ vtep_loopback_network | default('10.0.0.0/24') }}"
+    management_network: "{{ management_network | default('10.0.1.0/24') }}"
+    
+    # Calculate derived values
+    spine_leaf_links: "{{ calculate_spine_leaf_links() }}"
+    vtep_ip_pool: "{{ vtep_loopback_network | ipaddr('net') }}"
+    management_ip_pool: "{{ management_network | ipaddr('net') }}"
+
+  tasks:
+    - name: Calculate interface IP assignments
+      set_fact:
+        interface_assignments: "{{ calculate_interface_ips(interface_ip_prefix) }}"
+
+    - name: Assign VTEP IPs to devices
+      set_fact:
+        vtep_ip: "{{ vtep_ip_pool | ipmath(hostvars[inventory_hostname].vtep_offset | default(0)) }}"
+      when: inventory_hostname in groups.spine + groups.leaf
+
+    - name: Assign management IPs
+      set_fact:
+        management_ip: "{{ management_ip_pool | ipmath(hostvars[inventory_hostname].mgmt_offset | default(0)) }}"
+      when: inventory_hostname in groups.spine + groups.leaf
+
+    - name: Update device ASNs based on survey
+      set_fact:
+        device_asn: "{{ spine_asn if inventory_hostname in groups.spine else (leaf_asn_base | int + hostvars[inventory_hostname].leaf_index | default(0)) }}"
+
+    - name: Include common system configuration
+      include_role:
+        name: common
+      tags: [system, common]
+
+    - name: Configure spine switches
+      include_role:
+        name: spine_switch
+      when: role == 'spine'
+      tags: [spine, fabric]
+
+    - name: Configure leaf switches
+      include_role:
+        name: leaf_switch
+      when: role == 'leaf'
+      tags: [leaf, fabric]
+
+    - name: Verify fabric connectivity
+      include_role:
+        name: fabric_verification
+      tags: [verify, test]
+      when: verification_enabled | default(true)
+
+- name: Configure DC Gateway (Interactive)
+  hosts: dc_gateway
+  gather_facts: no
+  vars:
+    ansible_network_os: huawei.vrrp
+    gateway_asn: "{{ gateway_asn | default('65400') }}"
+
+  tasks:
+    - name: Configure DC gateway
+      include_role:
+        name: dc_gateway
+      tags: [gateway, fabric]
+
+    - name: Verify gateway connectivity
+      include_role:
+        name: gateway_verification
+      tags: [verify, test]
+      when: verification_enabled | default(true)

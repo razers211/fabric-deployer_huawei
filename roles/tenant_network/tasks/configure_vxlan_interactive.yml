@@ -1,0 +1,48 @@
+---
+- name: Create VXLAN VNI with interactive parameters
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "vxlan vni {{ tenant_vni }}"
+      - "description {{ tenant_name }} VXLAN VNI {{ tenant_vni }}"
+
+- name: Bind VNI to VLANs
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "bridge-domain {{ tenant_id }}"
+      - "vxlan vni {{ tenant_vni }}"
+      - "l2 multicast enable"
+
+- name: Configure VNI mapping for all VLANs
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "bridge-domain {{ tenant_id }}"
+      - "member {{ item }}"
+  loop: "{{ tenant_vlans }}"
+
+- name: Configure NVE interface for tenant VNI
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface {{ vxlan_nve_interface | default('Nve1') }}"
+      - "vni {{ tenant_vni }} head-end peer-list {{ item }}"
+  loop: "{{ groups.spine }}"
+  when: vxlan_nve_interface is defined
+
+- name: Configure EVPN for tenant VNI
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "bgp {{ device_asn | default(asn) }}"
+      - "l2vpn-family evpn"
+      - "peer {{ item }} advertise irb"
+      - "peer {{ item }} advertise l2vpn evpn"
+  loop: "{{ groups.spine }}"
+  when: device_asn is defined or asn is defined
+
+- name: Verify VXLAN VNI
+  huawei.vrrp.vrrp_command:
+    commands: "display vxlan vni {{ tenant_vni }}"
+  register: vni_check
+
+- name: Display VNI verification
+  debug:
+    msg: "VXLAN VNI {{ tenant_vni }} created successfully for {{ tenant_name }}"
+  when: tenant_vni|string in vni_check.stdout

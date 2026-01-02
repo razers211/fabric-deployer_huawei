@@ -1,0 +1,98 @@
+---
+- name: Spine-Leaf Fabric Deployment Workflow
+  description: Complete workflow for deploying spine-leaf architecture with tenant networks
+  survey_enabled: true
+  survey_spec:
+    name: Fabric Deployment Workflow
+    description: Complete fabric deployment with optional tenant setup
+    spec:
+      - question_name: Deployment Scope
+        question_description: Select what to deploy
+        required: true
+        type: multiplechoice
+        variable: deployment_scope
+        choices:
+          - fabric_only
+          - fabric_with_tenants
+          - tenants_only
+        default: fabric_with_tenants
+      - question_name: Enable Verification
+        question_description: Run verification tests after deployment
+        required: true
+        type: boolean
+        variable: run_verification
+        default: "true"
+      - question_name: Backup Configuration
+        question_description: Create backup before making changes
+        required: true
+        type: boolean
+        variable: create_backup
+        default: "true"
+
+  workflow_nodes:
+    - identifier: backup_config
+      unified_job_template: Backup Network Configuration
+      success_nodes:
+        - deploy_fabric
+      failure_nodes: []
+      always_nodes: []
+
+    - identifier: deploy_fabric
+      unified_job_template: Deploy Spine-Leaf Fabric
+      success_nodes:
+        - verify_fabric
+      failure_nodes:
+        - notify_failure
+      always_nodes: []
+
+    - identifier: verify_fabric
+      unified_job_template: Verify Fabric Connectivity
+      success_nodes:
+        - deploy_tenants
+      failure_nodes:
+        - notify_failure
+      always_nodes: []
+
+    - identifier: deploy_tenants
+      unified_job_template: Deploy Tenant Networks
+      success_nodes:
+        - verify_tenants
+      failure_nodes:
+        - notify_failure
+      always_nodes: []
+
+    - identifier: verify_tenants
+      unified_job_template: Verify Tenant Networks
+      success_nodes:
+        - announce_to_gateway
+      failure_nodes:
+        - notify_failure
+      always_nodes: []
+
+    - identifier: announce_to_gateway
+      unified_job_template: Announce to DC Gateway
+      success_nodes:
+        - final_verification
+      failure_nodes:
+        - notify_failure
+      always_nodes: []
+
+    - identifier: final_verification
+      unified_job_template: End-to-End Verification
+      success_nodes:
+        - notify_success
+      failure_nodes:
+        - notify_failure
+      always_nodes: []
+
+    - identifier: notify_success
+      unified_job_template: Send Success Notification
+      success_nodes: []
+      failure_nodes: []
+      always_nodes: []
+
+    - identifier: notify_failure
+      unified_job_template: Send Failure Notification
+      success_nodes: []
+      failure_nodes: []
+      always_nodes: []

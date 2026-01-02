@@ -1,0 +1,15 @@
+---
+- name: Configure DC gateway interfaces
+  include_tasks: configure_gateway_interfaces.yml
+
+- name: Configure BGP on gateway
+  include_tasks: configure_bgp.yml
+
+- name: Configure route redistribution
+  include_tasks: configure_redistribution.yml
+
+- name: Configure prefix lists
+  include_tasks: configure_prefix_lists.yml
+
+- name: Verify gateway configuration
+  include_tasks: verify_gateway.yml

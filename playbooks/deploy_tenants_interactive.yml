@@ -1,0 +1,69 @@
+---
+- name: Deploy Tenant Networks (Interactive)
+  hosts: tenants
+  gather_facts: no
+  serial: 1
+  vars:
+    ansible_network_os: huawei.vrrp
+    
+    # Interactive variables from AWX survey
+    tenant_id: "{{ tenant_id | default(100) }}"
+    tenant_name: "{{ tenant_name | default('New Tenant') }}"
+    vlan_range: "{{ vlan_range | default('1000-1099') }}"
+    tenant_vni: "{{ tenant_vni | default(10100) }}"
+    vrf_name: "{{ vrf_name | default('VRF_TENANT_A') }}"
+    tenant_network_prefix: "{{ tenant_network_prefix | default('10.100.') }}"
+    tenant_subnet_mask: "{{ tenant_subnet_mask | default('24') }}"
+    tenant_gateway_ip: "{{ tenant_gateway_ip | default('.1') }}"
+    route_distinguisher: "{{ route_distinguisher | default('65001:100') }}"
+    route_target: "{{ route_target | default('65001:100') }}"
+    gateway_announcement: "{{ gateway_announcement | default(true) }}"
+    dhcp_servers: "{{ dhcp_servers | default('10.0.0.10,10.0.0.11') }}"
+    
+    # Parse VLAN range
+    tenant_vlans: "{{ vlan_range | regex_replace('-', '..') | range_expand | list }}"
+
+  tasks:
+    - name: Parse DHCP servers list
+      set_fact:
+        dhcp_server_list: "{{ dhcp_servers.split(',') | map('trim') | list }}"
+      when: dhcp_servers is defined and dhcp_servers != ""
+
+    - name: Create tenant VRF
+      include_role:
+        name: tenant_network
+        tasks_from: create_vrf_interactive
+      tags: [vrf, tenant]
+
+    - name: Configure tenant VLANs
+      include_role:
+        name: tenant_network
+        tasks_from: configure_vlans_interactive
+      tags: [vlan, tenant]
+
+    - name: Configure VXLAN for tenant
+      include_role:
+        name: tenant_network
+        tasks_from: configure_vxlan_interactive
+      tags: [vxlan, tenant]
+
+    - name: Configure tenant SVIs
+      include_role:
+        name: tenant_network
+        tasks_from: configure_svi_interactive
+      tags: [svi, tenant]
+
+    - name: Advertise tenant networks to gateway
+      include_role:
+        name: tenant_network
+        tasks_from: advertise_to_gateway_interactive
+      tags: [gateway, tenant]
+      when: 
+        - gateway_announcement | default(false)
+        - role == 'leaf'
+
+    - name: Verify tenant configuration
+      include_role:
+        name: tenant_network
+        tasks_from: verify_tenant_interactive
+      tags: [verify, tenant]

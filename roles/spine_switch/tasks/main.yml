@@ -1,0 +1,15 @@
+---
+- name: Configure spine interfaces
+  include_tasks: configure_spine_interfaces.yml
+
+- name: Configure BGP on spine
+  include_tasks: configure_bgp.yml
+
+- name: Configure EVPN address family
+  include_tasks: configure_evpn.yml
+
+- name: Configure VXLAN
+  include_tasks: configure_vxlan.yml
+
+- name: Verify spine configuration
+  include_tasks: verify_spine.yml

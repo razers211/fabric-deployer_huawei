@@ -1,0 +1,47 @@
+---
+- name: Deploy Spine-Leaf Fabric
+  hosts: spine, leaf
+  gather_facts: no
+  serial: 1
+  vars:
+    ansible_network_os: huawei.vrrp
+  
+  tasks:
+    - name: Include common system configuration
+      include_role:
+        name: common
+      tags: [system, common]
+
+    - name: Configure spine switches
+      include_role:
+        name: spine_switch
+      when: role == 'spine'
+      tags: [spine, fabric]
+
+    - name: Configure leaf switches
+      include_role:
+        name: leaf_switch
+      when: role == 'leaf'
+      tags: [leaf, fabric]
+
+    - name: Verify fabric connectivity
+      include_role:
+        name: fabric_verification
+      tags: [verify, test]
+
+- name: Configure DC Gateway
+  hosts: dc_gateway
+  gather_facts: no
+  vars:
+    ansible_network_os: huawei.vrrp
+  
+  tasks:
+    - name: Configure DC gateway
+      include_role:
+        name: dc_gateway
+      tags: [gateway, fabric]
+
+    - name: Verify gateway connectivity
+      include_role:
+        name: gateway_verification
+      tags: [verify, test]

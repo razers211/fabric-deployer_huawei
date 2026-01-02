@@ -1,0 +1,33 @@
+---
+- name: Configure BGP process on gateway
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "bgp {{ dc_gateway_asn }}"
+      - "router-id {{ router_id }}"
+      - "peer {{ item }} as-number {{ hostvars[item].asn }}"
+      - "peer {{ item }} connect-retry-interval {{ bgp_connect_retry }}"
+      - "peer {{ item }} hold-time {{ bgp_hold_time }}"
+      - "peer {{ item }} keepalive-time {{ bgp_keepalive }}"
+  loop: "{{ groups.spine }}"
+  when: 
+    - dc_gateway_asn is defined
+    - router_id is defined
+
+- name: Configure BGP address families
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "bgp {{ dc_gateway_asn }}"
+      - "ipv4-family unicast"
+      - "peer {{ item }} enable"
+      - "peer {{ item }} route-policy SPINE_IN in"
+      - "peer {{ item }} route-policy SPINE_OUT out"
+  loop: "{{ groups.spine }}"
+
+- name: Configure EVPN address family on gateway
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "bgp {{ dc_gateway_asn }}"
+      - "l2vpn-family evpn"
+      - "peer {{ item }} enable"
+      - "peer {{ item }} advertise irb"
+  loop: "{{ groups.spine }}"

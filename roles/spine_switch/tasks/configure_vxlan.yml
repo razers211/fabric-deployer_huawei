@@ -1,0 +1,22 @@
+---
+- name: Configure VXLAN NVE interface
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface {{ vxlan_nve_interface }}"
+      - "source {{ vxlan_source_interface }}"
+      - "description VXLAN NVE Interface"
+
+- name: Configure VXLAN VNI binding
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface {{ vxlan_nve_interface }}"
+      - "vni {{ tenant_vni_base + item.tenant_id }} head-end peer-list {{ hostvars[item].vtep_ip }}"
+  loop: "{{ groups.leaf }}"
+  when: 
+    - tenant_vni_base is defined
+    - hostvars[item].vtep_ip is defined
+
+- name: Enable VXLAN on spine
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "vxlan"

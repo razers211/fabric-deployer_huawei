@@ -1,0 +1,16 @@
+---
+collections:
+  - name: huawei.vrrp
+    version: ">=1.0.0"
+  - name: ansible.netcommon
+    version: ">=2.0.0"
+  - name: community.network
+    version: ">=3.0.0"
+
+roles:
+  - name: network.backup
+    src: https://github.com/ansible-network/backup
+    version: main
+  - name: network.verify
+    src: https://github.com/ansible-network/verify
+    version: main

@@ -1,0 +1,109 @@
+---
+- name: Deploy Tenant Networks (Interactive)
+  description: Deploy tenant networks with fully interactive configuration parameters
+  job_type: run
+  inventory: Spine-Leaf Fabric
+  project: Spine-Leaf Architecture
+  playbook: playbooks/deploy_tenants_interactive.yml
+  credentials:
+    - Network_Admin_Creds
+  verbosity: 2
+  job_tags: tenant
+  forks: 3
+  timeout: 1800
+  extra_vars:
+    tenant_deployment: true
+    gateway_announcement: true
+  ask_variables_on_launch: true
+  ask_tags_on_launch: true
+  ask_inventory_on_launch: true
+  ask_credential_on_launch: false
+  survey_enabled: true
+  survey_spec:
+    name: Interactive Tenant Deployment
+    description: Configure all tenant network parameters interactively
+    spec:
+      - question_name: Tenant ID
+        question_description: Enter tenant ID number (unique)
+        required: true
+        type: integer
+        variable: tenant_id
+        default: 100
+      - question_name: Tenant Name
+        question_description: Enter tenant name
+        required: true
+        type: text
+        variable: tenant_name
+        default: "New Tenant"
+      - question_name: VLAN Range
+        question_description: Enter VLAN range (e.g., 1000-1099)
+        required: true
+        type: text
+        variable: vlan_range
+        default: "1000-1099"
+      - question_name: VNI Number
+        question_description: VXLAN VNI for this tenant (unique)
+        required: true
+        type: integer
+        variable: tenant_vni
+        default: 10100
+      - question_name: VRF Name
+        question_description: VRF name for tenant isolation
+        required: true
+        type: text
+        variable: vrf_name
+        default: "VRF_TENANT_A"
+      - question_name: Network Prefix
+        question_description: Network prefix for tenant subnets (e.g., 10.100.)
+        required: true
+        type: text
+        variable: tenant_network_prefix
+        default: "10.100."
+      - question_name: Subnet Mask
+        question_description: Subnet mask for tenant networks
+        required: true
+        type: text
+        variable: tenant_subnet_mask
+        default: "24"
+      - question_name: Gateway IP
+        question_description: Gateway IP suffix for tenant networks (e.g., .1)
+        required: true
+        type: text
+        variable: tenant_gateway_ip
+        default: ".1"
+      - question_name: Route Distinguisher
+        question_description: Route distinguisher for VRF (format: ASN:ID)
+        required: true
+        type: text
+        variable: route_distinguisher
+        default: "65001:100"
+      - question_name: Route Target
+        question_description: Route target for VRF (format: ASN:ID)
+        required: true
+        type: text
+        variable: route_target
+        default: "65001:100"
+      - question_name: Enable Gateway Announcement
+        question_description: Announce tenant networks to DC gateway
+        required: true
+        type: boolean
+        variable: gateway_announcement
+        default: "true"
+      - question_name: DHCP Servers
+        question_description: DHCP server IPs (comma separated)
+        required: false
+        type: text
+        variable: dhcp_servers
+        default: "10.0.0.10,10.0.0.11"
+      - question_name: VRRP Priority
+        question_description: VRRP priority for this leaf switch
+        required: false
+        type: integer
+        variable: vrrp_priority
+        default: 100
+      - question_name: Enable Multicast
+        question_description: Enable multicast for tenant networks
+        required: true
+        type: boolean
+        variable: enable_multicast
+        default: "true"

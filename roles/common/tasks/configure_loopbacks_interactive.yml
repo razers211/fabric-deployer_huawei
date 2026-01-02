@@ -1,0 +1,35 @@
+---
+- name: Configure loopback0 for management with interactive IP
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface Loopback0"
+      - "ip address {{ management_ip }}/32"
+      - "description Management Loopback - {{ inventory_hostname }}"
+
+- name: Configure VTEP loopback with interactive network
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface {{ vxlan_vtep_loopback | default('Loopback1') }}"
+      - "ip address {{ vtep_ip }}/32"
+      - "description VTEP Loopback for VXLAN - {{ inventory_hostname }}"
+  when: 
+    - vxlan_vtep_loopback is defined
+    - vtep_ip is defined
+
+- name: Configure BGP router ID loopback with interactive IP
+  huawei.vrrp.vrrp_config:
+    lines:
+      - "interface Loopback2"
+      - "ip address {{ router_id }}/32"
+      - "description BGP Router ID - {{ inventory_hostname }}"
+  when: router_id is defined
+
+- name: Verify loopback interfaces
+  huawei.vrrp.vrrp_command:
+    commands: "display ip interface brief | include Loopback"
+  register: loopback_check
+
+- name: Display loopback verification
+  debug:
+    msg: "Loopback interfaces configured successfully for {{ inventory_hostname }}"
+  when: "'Loopback' in loopback_check.stdout"
