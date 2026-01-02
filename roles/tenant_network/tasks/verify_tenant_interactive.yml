@@ -1,0 +1,34 @@
+---
+- name: Verify tenant VRF
+  huawei.vrrp.vrrp_command:
+    commands: "display ip vpn-instance | include {{ vrf_name }}"
+  register: vrf_verification
+  failed_when: vrf_name not in vrf_verification.stdout
+
+- name: Verify tenant VLANs
+  huawei.vrrp.vrrp_command:
+    commands: "display vlan {{ item }}"
+  loop: "{{ tenant_vlans }}"
+  register: vlan_verification
+  failed_when: "'not found' in vlan_verification.stdout"
+
+- name: Verify tenant SVIs
+  huawei.vrrp.vrrp_command:
+    commands: "display interface Vlanif{{ item }}"
+  loop: "{{ tenant_vlans }}"
+  register: svi_verification
+
+- name: Verify VXLAN VNI
+  huawei.vrrp.vrrp_command:
+    commands: "display vxlan vni {{ tenant_vni }}"
+  register: vni_verification
+  failed_when: tenant_vni|string not in vni_verification.stdout
+
+- name: Verify routing in VRF
+  huawei.vrrp.vrrp_command:
+    commands: "display ip routing-table vpn-instance {{ vrf_name }}"
+  register: vrf_routing
+
+- name: Display tenant verification results
+  debug:
+    msg: "Tenant {{ tenant_name }} verification completed successfully"

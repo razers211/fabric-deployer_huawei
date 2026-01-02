@@ -1,0 +1,20 @@
+---
+- name: Verify BGP routes from fabric
+  huawei.vrrp.vrrp_command:
+    commands: "display bgp routing-table"
+  register: bgp_routes
+
+- name: Verify external connectivity
+  huawei.vrrp.vrrp_command:
+    commands: "ping 8.8.8.8"
+  register: external_ping
+  failed_when: "'success' not in external_ping.stdout"
+
+- name: Verify EVPN routes
+  huawei.vrrp.vrrp_command:
+    commands: "display bgp evpn routing-table"
+  register: evpn_routes
+
+- name: Display gateway verification results
+  debug:
+    msg: "Gateway verification completed successfully"

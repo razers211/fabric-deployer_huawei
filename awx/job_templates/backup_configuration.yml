@@ -1,0 +1,36 @@
+---
+- name: Backup Network Configuration
+  description: Backup configuration from all network devices
+  job_type: run
+  inventory: Spine-Leaf Fabric
+  project: Spine-Leaf Architecture
+  playbook: playbooks/backup_configuration.yml
+  credentials:
+    - Network_Admin_Creds
+  verbosity: 2
+  job_tags: backup
+  forks: 5
+  timeout: 1800
+  extra_vars:
+    backup_path: "/tmp/ansible_backups"
+  ask_variables_on_launch: true
+  ask_tags_on_launch: false
+  ask_inventory_on_launch: false
+  ask_credential_on_launch: false
+  survey_enabled: true
+  survey_spec:
+    name: Backup Configuration Options
+    description: Configure backup parameters
+    spec:
+      - question_name: Backup Path
+        question_description: Directory path to store backup files
+        required: true
+        type: text
+        variable: backup_path
+        default: "/tmp/ansible_backups"
+      - question_name: Include Timestamp
+        question_description: Add timestamp to backup filenames
+        required: true
+        type: boolean
+        variable: include_timestamp
+        default: "true"
