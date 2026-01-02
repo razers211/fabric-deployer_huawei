@@ -4,29 +4,30 @@
   gather_facts: no
   serial: 1
   vars:
-    ansible_network_os: huawei.vrp
+    ansible_network_os: ce
+    ansible_connection: network_cli
   
   tasks:
     - name: Check BGP neighbor status
-      huawei.vrrp.vrrp_command:
+      ansible.netcommon.cli_command:
         commands: "display bgp peer"
       register: bgp_peers
       failed_when: "'Established' not in bgp_peers.stdout"
 
     - name: Check interface status
-      huawei.vrrp.vrrp_command:
+      ansible.netcommon.cli_command:
         commands: "display interface brief"
       register: interfaces
       failed_when: "'down' in interfaces.stdout"
 
     - name: Check VXLAN tunnel status
-      huawei.vrrp.vrrp_command:
+      ansible.netcommon.cli_command:
         commands: "display vxlan tunnel"
       register: vxlan_tunnels
       when: role == 'leaf'
 
     - name: Verify VTEP reachability
-      huawei.vrrp.vrrp_command:
+      ansible.netcommon.cli_command:
         commands: "ping {{ hostvars[item].vtep_ip }}"
       loop: "{{ groups.spine if role == 'leaf' else groups.leaf }}"
       register: vtep_ping
@@ -43,16 +44,17 @@
   hosts: dc_gateway
   gather_facts: no
   vars:
-    ansible_network_os: huawei.vrp
+    ansible_network_os: ce
+    ansible_connection: network_cli
   
   tasks:
     - name: Check BGP routes from fabric
-      huawei.vrrp.vrrp_command:
+      ansible.netcommon.cli_command:
         commands: "display bgp routing-table"
       register: bgp_routes
 
     - name: Verify external connectivity
-      huawei.vrrp.vrrp_command:
+      ansible.netcommon.cli_command:
         commands: "ping 8.8.8.8"
       register: external_ping
       failed_when: "'success' not in external_ping.stdout"

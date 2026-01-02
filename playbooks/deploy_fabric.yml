@@ -4,7 +4,8 @@
   gather_facts: no
   serial: 1
   vars:
-    ansible_network_os: huawei.vrp
+    ansible_network_os: ce
+    ansible_connection: network_cli
   
   tasks:
     - name: Include common system configuration
@@ -33,7 +34,8 @@
   hosts: dc_gateway
   gather_facts: no
   vars:
-    ansible_network_os: huawei.vrp
+    ansible_network_os: ce
+    ansible_connection: network_cli
   
   tasks:
     - name: Configure DC gateway

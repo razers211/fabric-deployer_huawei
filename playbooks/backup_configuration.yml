@@ -4,7 +4,8 @@
   gather_facts: no
   serial: 1
   vars:
-    ansible_network_os: huawei.vrp
+    ansible_network_os: ce
+    ansible_connection: network_cli
     backup_dir: "{{ backup_path | default('/tmp/ansible_backups') }}"
     timestamp: "{{ ansible_date_time.epoch }}"
 
@@ -18,7 +19,7 @@
       run_once: true
 
     - name: Get current configuration
-      huawei.vrp.vrp_command:
+      ansible.netcommon.cli_command:
         commands: "display current-configuration"
       register: device_config
 

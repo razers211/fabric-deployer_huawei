@@ -4,7 +4,8 @@
   gather_facts: no
   serial: 1
   vars:
-    ansible_network_os: huawei.vrp
+    ansible_network_os: ce
+    ansible_connection: network_cli
   
   tasks:
     - name: Create tenant VRF

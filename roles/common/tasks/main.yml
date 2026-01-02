@@ -1,39 +1,39 @@
 ---
 - name: Configure system hostname
-  huawei.vrp.vrp_config:
-    lines:
+  ansible.netcommon.cli_config:
+    config:
       - "sysname {{ inventory_hostname }}"
 
 - name: Configure NTP servers
-  huawei.vrp.vrp_config:
-    lines:
+  ansible.netcommon.cli_config:
+    config:
       - "ntp-server {{ item }}"
   loop: "{{ ntp_servers }}"
   when: ntp_servers is defined
 
 - name: Configure syslog servers
-  huawei.vrp.vrp_config:
-    lines:
+  ansible.netcommon.cli_config:
+    config:
       - "loghost {{ item }}"
   loop: "{{ syslog_servers }}"
   when: syslog_servers is defined
 
 - name: Configure SNMP
-  huawei.vrp.vrp_config:
-    lines:
+  ansible.netcommon.cli_config:
+    config:
       - "snmp-agent community read {{ snmp_community }}"
       - "snmp-agent sys-info location {{ snmp_location }}"
       - "snmp-agent sys-info contact {{ snmp_contact }}"
   when: snmp_community is defined
 
 - name: Enable IP routing
-  huawei.vrp.vrp_config:
-    lines:
+  ansible.netcommon.cli_config:
+    config:
       - "ip routing"
 
 - name: Configure loopback interfaces
   include_tasks: configure_loopbacks.yml
 
 - name: Save configuration
-  huawei.vrp.vrp_command:
+  ansible.netcommon.cli_command:
     commands: "save"
