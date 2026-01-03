@@ -9,26 +9,22 @@
   
   tasks:
     - name: Check BGP neighbor status
-      ansible.netcommon.cli_command:
-        commands: "display bgp peer"
+      raw: "display bgp peer"
       register: bgp_peers
       failed_when: "'Established' not in bgp_peers.stdout"
 
     - name: Check interface status
-      ansible.netcommon.cli_command:
-        commands: "display interface brief"
+      raw: "display interface brief"
       register: interfaces
       failed_when: "'down' in interfaces.stdout"
 
     - name: Check VXLAN tunnel status
-      ansible.netcommon.cli_command:
-        commands: "display vxlan tunnel"
+      raw: "display vxlan tunnel"
       register: vxlan_tunnels
       when: role == 'leaf'
 
     - name: Verify VTEP reachability
-      ansible.netcommon.cli_command:
-        commands: "ping {{ hostvars[item].vtep_ip }}"
+      raw: "ping {{ hostvars[item].vtep_ip }}"
       loop: "{{ groups.spine if role == 'leaf' else groups.leaf }}"
       register: vtep_ping
       failed_when: "'success' not in vtep_ping.stdout"
@@ -49,13 +45,11 @@
   
   tasks:
     - name: Check BGP routes from fabric
-      ansible.netcommon.cli_command:
-        commands: "display bgp routing-table"
+      raw: "display bgp routing-table"
       register: bgp_routes
 
     - name: Verify external connectivity
-      ansible.netcommon.cli_command:
-        commands: "ping 8.8.8.8"
+      raw: "ping 8.8.8.8"
       register: external_ping
       failed_when: "'success' not in external_ping.stdout"
 

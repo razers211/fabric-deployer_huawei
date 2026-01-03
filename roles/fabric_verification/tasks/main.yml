@@ -1,25 +1,21 @@
 ---
 - name: Verify BGP neighbors
-  ansible.netcommon.cli_command:
-    commands: "display bgp peer"
+  raw: "display bgp peer"
   register: bgp_peer_status
   failed_when: "'Established' not in bgp_peer_status.stdout"
 
 - name: Verify interface status
-  ansible.netcommon.cli_command:
-    commands: "display interface brief"
+  raw: "display interface brief"
   register: interface_status
   failed_when: "'down' in interface_status.stdout"
 
 - name: Verify VXLAN tunnels (leaf switches)
-  ansible.netcommon.cli_command:
-    commands: "display vxlan tunnel"
+  raw: "display vxlan tunnel"
   register: vxlan_status
   when: role == 'leaf'
 
 - name: Verify VTEP reachability
-  ansible.netcommon.cli_command:
-    commands: "ping {{ hostvars[item].vtep_ip | default(hostvars[item].ansible_host) }}"
+  raw: "ping {{ hostvars[item].vtep_ip | default(hostvars[item].ansible_host) }}"
   loop: "{{ groups.spine if role == 'leaf' else groups.leaf }}"
   register: vtep_ping
   failed_when: "'success' not in vtep_ping.stdout"

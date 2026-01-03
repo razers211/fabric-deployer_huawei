@@ -1,25 +1,25 @@
 ---
 - name: Configure loopback0 for management
-  ansible.netcommon.cli_config:
-    config:
-      - "interface Loopback0"
-      - "ip address {{ ansible_host }}/32"
-      - "description Management Loopback"
+  raw: |
+    interface Loopback0
+    ip address {{ ansible_host }}/32
+    description Management Loopback
+    quit
 
 - name: Configure VTEP loopback for VXLAN
-  ansible.netcommon.cli_config:
-    config:
-      - "interface {{ vxlan_vtep_loopback }}"
-      - "ip address {{ hostvars[inventory_hostname].vtep_ip }}/32"
-      - "description VTEP Loopback for VXLAN"
+  raw: |
+    interface {{ vxlan_vtep_loopback }}
+    ip address {{ hostvars[inventory_hostname].vtep_ip }}/32
+    description VTEP Loopback for VXLAN
+    quit
   when: 
     - vxlan_vtep_loopback is defined
     - hostvars[inventory_hostname].vtep_ip is defined
 
 - name: Configure BGP router ID loopback
-  ansible.netcommon.cli_config:
-    config:
-      - "interface Loopback2"
-      - "ip address {{ router_id }}/32"
-      - "description BGP Router ID"
+  raw: |
+    interface Loopback2
+    ip address {{ router_id }}/32
+    description BGP Router ID
+    quit
   when: router_id is defined

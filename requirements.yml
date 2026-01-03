@@ -1,10 +1,10 @@
 ---
-collections:
-  - name: ansible.netcommon
-    version: ">=2.0.0"
-  - name: community.network
-    version: ">=3.0.0"
+# collections:
+#   - name: ansible.netcommon
+#     version: ">=5.0.0,<6.0.0"
+#   - name: community.network
+#     version: ">=5.0.0,<6.0.0"
 
-# Note: Using generic network modules for Huawei devices
-# Connection: network_cli
-# Modules: cli_command, cli_config
+# Note: Using built-in Ansible modules for Ansible 2.15.13
+# No external collections required
+# Using: raw, command, and shell modules for network devices

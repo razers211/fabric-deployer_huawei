@@ -1,39 +1,34 @@
 ---
 - name: Configure system hostname
-  ansible.netcommon.cli_config:
-    config:
-      - "sysname {{ inventory_hostname }}"
+  raw: "sysname {{ inventory_hostname }}"
 
 - name: Configure NTP servers
-  ansible.netcommon.cli_config:
-    config:
-      - "ntp-server {{ item }}"
+  raw: "ntp-server {{ item }}"
   loop: "{{ ntp_servers }}"
   when: ntp_servers is defined
 
 - name: Configure syslog servers
-  ansible.netcommon.cli_config:
-    config:
-      - "loghost {{ item }}"
+  raw: "loghost {{ item }}"
   loop: "{{ syslog_servers }}"
   when: syslog_servers is defined
 
 - name: Configure SNMP
-  ansible.netcommon.cli_config:
-    config:
-      - "snmp-agent community read {{ snmp_community }}"
-      - "snmp-agent sys-info location {{ snmp_location }}"
-      - "snmp-agent sys-info contact {{ snmp_contact }}"
+  raw: "snmp-agent community read {{ snmp_community }}"
   when: snmp_community is defined
 
+- name: Configure SNMP location
+  raw: "snmp-agent sys-info location {{ snmp_location }}"
+  when: snmp_location is defined
+
+- name: Configure SNMP contact
+  raw: "snmp-agent sys-info contact {{ snmp_contact }}"
+  when: snmp_contact is defined
+
 - name: Enable IP routing
-  ansible.netcommon.cli_config:
-    config:
-      - "ip routing"
+  raw: "ip routing"
 
 - name: Configure loopback interfaces
   include_tasks: configure_loopbacks.yml
 
 - name: Save configuration
-  ansible.netcommon.cli_command:
-    commands: "save"
+  raw: "save"

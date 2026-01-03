@@ -1,18 +1,15 @@
 ---
 - name: Verify BGP routes from fabric
-  ansible.netcommon.cli_command:
-    commands: "display bgp routing-table"
+  raw: "display bgp routing-table"
   register: bgp_routes
 
 - name: Verify external connectivity
-  ansible.netcommon.cli_command:
-    commands: "ping 8.8.8.8"
+  raw: "ping 8.8.8.8"
   register: external_ping
   failed_when: "'success' not in external_ping.stdout"
 
 - name: Verify EVPN routes
-  ansible.netcommon.cli_command:
-    commands: "display bgp evpn routing-table"
+  raw: "display bgp evpn routing-table"
   register: evpn_routes
 
 - name: Display gateway verification results

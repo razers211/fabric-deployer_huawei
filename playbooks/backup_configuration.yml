@@ -19,8 +19,7 @@
       run_once: true
 
     - name: Get current configuration
-      ansible.netcommon.cli_command:
-        commands: "display current-configuration"
+      raw: "display current-configuration"
       register: device_config
 
     - name: Save configuration to file
