@@ -11,11 +11,11 @@
 
   tasks:
     - name: Create backup directory
-      file:
+      local_action:
+        module: file
         path: "{{ backup_dir }}"
         state: directory
         mode: '0755'
-      delegate_to: localhost
       run_once: true
 
     - name: Get current configuration
@@ -23,11 +23,11 @@
       register: device_config
 
     - name: Save configuration to file
-      copy:
+      local_action:
+        module: copy
         content: "{{ device_config.stdout }}"
         dest: "{{ backup_dir }}/{{ inventory_hostname }}_{{ timestamp }}.cfg"
         mode: '0644'
-      delegate_to: localhost
 
     - name: Display backup completion
       debug:
