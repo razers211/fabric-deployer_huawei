@@ -5,7 +5,7 @@
   serial: 1
   vars:
     ansible_network_os: ce
-    ansible_connection: network_cli
+    ansible_connection: ssh
     
     # Set defaults that can be overridden by AWX survey variables
     interface_ip_prefix: "{{ interface_ip_prefix | default('10.255.1.0/31') }}"
@@ -68,7 +68,7 @@
   gather_facts: no
   vars:
     ansible_network_os: ce
-    ansible_connection: network_cli
+    ansible_connection: ssh
     gateway_asn: "{{ gateway_asn | default('65400') }}"
 
   tasks:

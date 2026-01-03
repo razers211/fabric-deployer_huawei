@@ -5,7 +5,7 @@
   serial: 1
   vars:
     ansible_network_os: ce
-    ansible_connection: network_cli
+    ansible_connection: ssh
     
     # Interactive variables from AWX survey
     tenant_id: "{{ tenant_id | default(100) }}"

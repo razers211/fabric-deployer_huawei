@@ -6,9 +6,10 @@ all:
         SPINE1:
           ansible_host: 10.72.0.50
           ansible_network_os: ce
-          ansible_connection: network_cli
+          ansible_connection: ssh
           ansible_user: huawei
           ansible_password: "Huawei@123"
+          ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
           device_type: ce6800
           role: spine
           asn: 4200000062
@@ -16,9 +17,10 @@ all:
         SPINE2:
           ansible_host: 10.72.0.51
           ansible_network_os: ce
-          ansible_connection: network_cli
+          ansible_connection: ssh
           ansible_user: huawei
           ansible_password: "Huawei@123"
+          ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
           device_type: ce6800
           role: spine
           asn: 4200000062
@@ -29,9 +31,10 @@ all:
         LEAF1:
           ansible_host: 10.72.0.52
           ansible_network_os: ce
-          ansible_connection: network_cli
+          ansible_connection: ssh
           ansible_user: huawei
           ansible_password: "Huawei@123"
+          ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
           device_type: ce6800
           role: leaf
           asn: 4200000063
@@ -40,9 +43,10 @@ all:
         LEAF2:
           ansible_host: 10.72.0.53
           ansible_network_os: ce
-          ansible_connection: network_cli
+          ansible_connection: ssh
           ansible_user: huawei
           ansible_password: "Huawei@123"
+          ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
           device_type: ce6800
           role: leaf
           asn: 4200000063
@@ -71,5 +75,6 @@ all:
             LEAF2:
 
   vars:
-    ansible_connection: network_cli
+    ansible_connection: ssh
+    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
     ansible_command_timeout: 60
