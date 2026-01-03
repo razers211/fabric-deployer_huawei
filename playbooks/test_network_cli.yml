@@ -1,0 +1,19 @@
+---
+- name: Test Network CLI Connectivity
+  hosts: spine,leaf
+  gather_facts: no
+  serial: 1
+  vars:
+    ansible_network_os: ce
+    ansible_connection: network_cli
+
+  tasks:
+    - name: Test basic connectivity
+      ansible.netcommon.cli_command:
+        commands: "display version"
+      register: version_output
+
+    - name: Display connection status
+      debug:
+        msg: "Successfully connected to {{ inventory_hostname }} - {{ version_output.stdout_lines[0] if version_output.stdout_lines is defined else 'No output' }}"
+      when: version_output.stdout is defined

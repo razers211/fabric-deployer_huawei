@@ -1,0 +1,20 @@
+---
+- name: Simple Raw Test
+  hosts: spine,leaf
+  gather_facts: no
+  serial: 1
+  vars:
+    ansible_connection: ssh
+    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o KexAlgorithms=+diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1 -o Ciphers=+aes128-cbc,aes192-cbc,aes256-cbc -o MACs=+hmac-sha1-96,hmac-sha2-256,hmac-sha2-512 -o ServerAliveInterval=30 -o ServerAliveCountMax=3"
+    ansible_command_timeout: 30
+    ansible_connect_timeout: 30
+
+  tasks:
+    - name: Simple version command
+      raw: "display version | head -5"
+      register: version_output
+      timeout: 20
+
+    - name: Show result
+      debug:
+        msg: "{{ inventory_hostname }}: {{ version_output.stdout if version_output.stdout is defined else 'No output' }}"
