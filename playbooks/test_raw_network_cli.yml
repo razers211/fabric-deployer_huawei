@@ -1,16 +1,15 @@
 ---
-- name: Test Network CLI Connectivity
+- name: Test Raw with Network CLI
   hosts: spine,leaf
   gather_facts: no
   serial: 1
   vars:
-    ansible_network_os: huawei
+    ansible_network_os: generic
     ansible_connection: network_cli
 
   tasks:
-    - name: Test basic connectivity
-      ansible.netcommon.cli_command:
-        commands: "display version"
+    - name: Test basic connectivity with raw
+      raw: "display version"
       register: version_output
 
     - name: Display connection status
