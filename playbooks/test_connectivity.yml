@@ -1,6 +1,6 @@
 ---
 - name: Test Network Connectivity
-  hosts: spine_leaf
+  hosts: spine,leaf
   gather_facts: no
   serial: 1
   vars:
