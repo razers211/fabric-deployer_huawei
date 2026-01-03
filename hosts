@@ -1,10 +1,10 @@
 [spine]
-SPINE1 ansible_host=10.72.0.50 ansible_connection=ssh ansible_user=huawei ansible_password="Huawei@123" ansible_ssh_extra_args="-o StrictHostKeyChecking=no"
-SPINE2 ansible_host=10.72.0.51 ansible_connection=ssh ansible_user=huawei ansible_password="Huawei@123" ansible_ssh_extra_args="-o StrictHostKeyChecking=no"
+SPINE1 ansible_host=10.72.0.50 ansible_connection=ssh ansible_user=huawei ansible_password="Huawei@123" ansible_ssh_extra_args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o KexAlgorithms=+diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1 -o Ciphers=+aes128-cbc,aes192-cbc,aes256-cbc -o MACs=+hmac-sha1-96,hmac-sha2-256,hmac-sha2-512 -o ServerAliveInterval=30 -o ServerAliveCountMax=3"
+SPINE2 ansible_host=10.72.0.51 ansible_connection=ssh ansible_user=huawei ansible_password="Huawei@123" ansible_ssh_extra_args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o KexAlgorithms=+diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1 -o Ciphers=+aes128-cbc,aes192-cbc,aes256-cbc -o MACs=+hmac-sha1-96,hmac-sha2-256,hmac-sha2-512 -o ServerAliveInterval=30 -o ServerAliveCountMax=3"
 
 [leaf]
-LEAF1 ansible_host=10.72.0.52 ansible_connection=ssh ansible_user=huawei ansible_password="Huawei@123" ansible_ssh_extra_args="-o StrictHostKeyChecking=no"
-LEAF2 ansible_host=10.72.0.53 ansible_connection=ssh ansible_user=huawei ansible_password="Huawei@123" ansible_ssh_extra_args="-o StrictHostKeyChecking=no"
+LEAF1 ansible_host=10.72.0.52 ansible_connection=ssh ansible_user=huawei ansible_password="Huawei@123" ansible_ssh_extra_args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o KexAlgorithms=+diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1 -o Ciphers=+aes128-cbc,aes192-cbc,aes256-cbc -o MACs=+hmac-sha1-96,hmac-sha2-256,hmac-sha2-512 -o ServerAliveInterval=30 -o ServerAliveCountMax=3"
+LEAF2 ansible_host=10.72.0.53 ansible_connection=ssh ansible_user=huawei ansible_password="Huawei@123" ansible_ssh_extra_args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o KexAlgorithms=+diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1 -o Ciphers=+aes128-cbc,aes192-cbc,aes256-cbc -o MACs=+hmac-sha1-96,hmac-sha2-256,hmac-sha2-512 -o ServerAliveInterval=30 -o ServerAliveCountMax=3"
 
 [spine_leaf:children]
 spine

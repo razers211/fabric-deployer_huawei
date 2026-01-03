@@ -1,17 +1,27 @@
 ---
 - name: Test Network Connectivity
-  hosts: spine, leaf
+  hosts: spine_leaf
   gather_facts: no
+  serial: 1
   vars:
-    ansible_network_os: ce
-    ansible_connection: ssh
-    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
+    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o KexAlgorithms=+diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1 -o Ciphers=+aes128-cbc,aes192-cbc,aes256-cbc -o MACs=+hmac-sha1-96,hmac-sha2-256,hmac-sha2-512 -o ServerAliveInterval=30 -o ServerAliveCountMax=3"
 
   tasks:
-    - name: Test basic connectivity
+    - name: Wait for SSH to be available
+      wait_for:
+        host: "{{ ansible_host }}"
+        port: 22
+        timeout: 30
+      delegate_to: localhost
+
+    - name: Test basic connectivity with timeout
       raw: "display version"
       register: version_output
+      timeout: 30
+      retries: 3
+      delay: 5
 
-    - name: Display version
+    - name: Display connection status
       debug:
-        msg: "{{ version_output.stdout_lines[0] if version_output.stdout_lines is defined else 'No output' }}"
+        msg: "Successfully connected to {{ inventory_hostname }} - {{ version_output.stdout_lines[0] if version_output.stdout_lines is defined else 'No output' }}"
+      when: version_output.stdout is defined
