@@ -1,0 +1,10 @@
+---
+- name: Simple Test
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Ping test
+      ping:
+      delegate_to: "{{ ansible_host }}"
+      vars:
+        ansible_connection: ssh

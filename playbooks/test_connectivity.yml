@@ -1,0 +1,17 @@
+---
+- name: Test Network Connectivity
+  hosts: spine, leaf
+  gather_facts: no
+  vars:
+    ansible_network_os: ce
+    ansible_connection: ssh
+    ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
+
+  tasks:
+    - name: Test basic connectivity
+      raw: "display version"
+      register: version_output
+
+    - name: Display version
+      debug:
+        msg: "{{ version_output.stdout_lines[0] if version_output.stdout_lines is defined else 'No output' }}"
